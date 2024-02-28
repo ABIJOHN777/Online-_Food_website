@@ -16,29 +16,26 @@ export default function Cart() {
   var subtotal = cartItems.reduce((x,items)=> x+items.price , 0)
   const userInfo = JSON.parse(window.localStorage.getItem("userInfo")) || {};
   const wallet=userInfo.wallet
-  
+
   const updateLocalStorage = (newWallet) => {
 
-    window.localStorage.setItem("userInfo", JSON.stringify({ ...userInfo, wallet: newWallet }));
+   window.localStorage.setItem("userInfo", JSON.stringify({ ...userInfo, wallet: newWallet }));
   };
 
+  console.log(cartItems)
   const handleSubmit = async () => {
     try {
-      const updatewallet = wallet - subtotal;
-      if(updatewallet>=0){
-        //await axios.put(`http://localhost:3001/UpdateUser/${userInfo._id}`, { wallet: updatewallet });
-        updateLocalStorage(updatewallet);
-        navigate('/Order');
-       window.location.reload()
+      const ownerID=userInfo._id
+      await axios.post("http://localhost:3001/user/cart",{ownerID,cartItems})
+      .then((result)=>{
+        alert(result.data.message)
+      })
+      .catch((err)=>{
+        alert('error')})      
+      } 
+      catch(err){
+        console.log("error")
       }
-    else{
-      alert("Dont have enough amount on wallet")
-    }
-
-    } catch (error) {
-      console.error("Error updating user wallet:", error);
-
-    }
   };
 
   return (
